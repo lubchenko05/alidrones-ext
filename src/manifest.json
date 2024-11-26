@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "AliDrones",
+  "name": "AliExporter",
   "version": "1.0",
-  "description": "Sync your Aliexpress drone orders with Google Sheets",
+  "description": "Sync your Aliexpress orders with Google Sheets",
   "permissions": [
     "tabs",
     "scripting",
