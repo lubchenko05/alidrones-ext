@@ -10,7 +10,12 @@ async function handleSyncOrders(sheetCode, sendResponse) {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     await clickViewOrders(tab.id);
-    const orders = await extractOrdersFromPage(tab.id);
+
+    const emailValue = await fetchEmail()
+    const email = emailValue ? emailValue : "N/A";
+    console.log(email);
+
+    const orders = await extractOrdersFromPage(tab.id, email);
 
     if (!orders || orders.length === 0) {
       sendResponse({ success: false, message: "No orders found on the page." });
@@ -73,12 +78,87 @@ function clickViewOrders(tabId) {
   });
 }
 
-function extractOrdersFromPage(tabId) {
+function fetchEmail() {
+  return new Promise((resolve, reject) => {
+    const profileUrl = "https://accounts.aliexpress.com/user/organization/manage_person_profile.htm";
+
+    chrome.tabs.create({ url: profileUrl, active: false }, async (newTab) => {
+      try {
+        await waitForProfilePageLoad(newTab.id);
+
+        chrome.scripting.executeScript(
+          {
+            target: { tabId: newTab.id },
+            func: () => {
+              const emailElement = document.querySelector("tr:nth-child(3) td");
+              if (emailElement) {
+                const email = emailElement.textContent.split(/\s+/)[0].trim();
+                return email;
+              }
+              return null;
+            },
+          },
+          (results) => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError.message);
+              chrome.tabs.remove(newTab.id);
+              return;
+            }
+
+            const email = results[0]?.result || "N/A";
+            chrome.tabs.remove(newTab.id);
+            resolve(email);
+          }
+        );
+      } catch (error) {
+        chrome.tabs.remove(newTab.id);
+        reject(error);
+      }
+    });
+  });
+}
+
+function waitForProfilePageLoad(tabId) {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      console.warn("Timeout: Profile page not loaded within 5 seconds");
+      resolve();
+    }, 5000);
+
+    const interval = setInterval(() => {
+      chrome.scripting.executeScript(
+        {
+          target: { tabId },
+          func: () => !!document.querySelector("#page960"),
+        },
+        (results) => {
+          if (chrome.runtime.lastError) {
+            clearInterval(interval);
+            clearTimeout(timeout);
+            reject(chrome.runtime.lastError.message);
+            return;
+          }
+
+          const isLoaded = results[0]?.result;
+          if (isLoaded) {
+            clearInterval(interval);
+            clearTimeout(timeout);
+            resolve();
+          }
+        }
+      );
+    }, 500);
+  });
+}
+
+async function extractOrdersFromPage(tabId, email) {
+
   return new Promise((resolve, reject) => {
     chrome.scripting.executeScript(
       {
         target: { tabId },
-        func: () => {
+        func: (email) => {
           const orders = [];
 
           document.querySelectorAll(".order-item").forEach((order) => {
@@ -124,14 +204,10 @@ function extractOrdersFromPage(tabId) {
             }
           });
 
-          const cookies = document.cookie;
-          const emailMatch = cookies.match(/rmb_pp=([^&;]+)/);
-          const email = emailMatch ? decodeURIComponent(emailMatch[1]) : "N/A";
-
           orders.forEach(order => (order.email = email));
-
           return orders;
         },
+        args: [email],
       },
       (results) => {
         if (chrome.runtime.lastError) {

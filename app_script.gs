@@ -19,7 +19,7 @@ function doPost(e) {
       orderDate: headerRow.indexOf("Order Date"),
     };
 
-    const currentDate = new Date(); // Поточна дата
+    const currentDate = new Date();
 
     data.forEach(order => {
       const uniqueKey = `${order.id}_${order.name}`;
@@ -69,21 +69,23 @@ function doPost(e) {
       }
     });
 
-    return ContentService
-      .createTextOutput(JSON.stringify({ success: true, message: "Data processed." }))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeader("Access-Control-Allow-Origin", "*");
-  } catch (error) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ success: false, error: error.message }))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeader("Access-Control-Allow-Origin", "*");
-  }
-}
+    const response = {
+      success: true,
+      message: "Data processed."
+    };
 
-function doGet(e) {
-  return ContentService
-    .createTextOutput("GET request received.")
-    .setMimeType(ContentService.MimeType.TEXT)
-    .setHeader("Access-Control-Allow-Origin", "*");
+    return ContentService.createTextOutput(JSON.stringify(response))
+      .setMimeType(ContentService.MimeType.JSON)
+      .getContent();
+
+  } catch (error) {
+    const errorResponse = {
+      success: false,
+      error: error.message
+    };
+    
+     return ContentService.createTextOutput(JSON.stringify(errorResponse))
+      .setMimeType(ContentService.MimeType.JSON)
+      .getContent();
+  }
 }
