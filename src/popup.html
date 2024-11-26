@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AliDrones - Sync Orders</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <h3 class="popup-title">Sync Orders</h3>
+    <label for="sheetCode" class="popup-label">Enter Token:</label>
+    <input type="text" id="sheetCode" class="popup-input" placeholder="Enter Token" />
+    <button id="syncOrders" class="popup-button">
+      <span class="button-text">Sync Orders</span>
+      <span class="button-loader"></span>
+    </button>
+    <p id="statusMessage" class="popup-status"></p>
+  </div>
+  <script src="popup.js" defer></script>
+</body>
+</html>
