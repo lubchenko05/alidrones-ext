@@ -57,4 +57,4 @@ Your AliExpress orders will now be synced to the Google Sheet you created.
 - Ensure that you have enabled permissions for the extension in your browser.
 - The extension and Google Apps Script are designed to work seamlessly together.
 
-Enjoy easier order management with **AliDrones**!
+Enjoy easier order management with **AliExporter**!
