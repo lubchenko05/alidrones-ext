@@ -9,6 +9,7 @@ function doPost(e) {
       id: headerRow.indexOf("Order ID"),
       name: headerRow.indexOf("Name"),
       status: headerRow.indexOf("Status"),
+      store: headerRow.indexOf("Store"),
       dateAdded: headerRow.indexOf("Date Added"),
       dateUpdated: headerRow.indexOf("Date Updated"),
       trackingNumbers: headerRow.indexOf("Tracking Numbers"),
@@ -51,6 +52,7 @@ function doPost(e) {
         sheet.getRange(rowToUpdate, columnIndexes.quantity + 1).setValue(order.quantity);
         sheet.getRange(rowToUpdate, columnIndexes.unitPrice + 1).setValue(order.pricePerUnit);
         sheet.getRange(rowToUpdate, columnIndexes.totalPrice + 1).setValue(order.total);
+        sheet.getRange(rowToUpdate, columnIndexes.store + 1).setValue(order.store);
       } else {
         const newRow = [];
         newRow[columnIndexes.id] = order.id;
@@ -64,7 +66,7 @@ function doPost(e) {
         newRow[columnIndexes.quantity] = order.quantity;
         newRow[columnIndexes.unitPrice] = order.pricePerUnit;
         newRow[columnIndexes.totalPrice] = order.total;
-
+        newRow[columnIndexes.store] = order.store;
         sheet.appendRow(newRow);
       }
     });

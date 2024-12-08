@@ -4,7 +4,6 @@
   "version": "1.0",
   "description": "Sync your Aliexpress orders with Google Sheets",
   "permissions": [
-    "tabs",
     "scripting",
     "activeTab",
     "storage"

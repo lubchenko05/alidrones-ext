@@ -185,6 +185,8 @@ async function extractOrdersFromPage(tabId, email) {
             const quantityMatch = quantityElement ? quantityElement.textContent.match(/x(\d+)/) : null;
             const quantity = quantityMatch ? parseInt(quantityMatch[1]) : 1;
 
+            const storeName = order.querySelector(".order-item-store-name span:first-child")?.textContent.trim();
+
             const trackingLinkElement = Array.from(order.querySelectorAll("a.order-item-btn, button.order-item-btn")).find(
               (btn) => btn.textContent.trim() === "Track order"
             );
@@ -200,6 +202,7 @@ async function extractOrdersFromPage(tabId, email) {
                 pricePerUnit,
                 quantity,
                 trackingLink,
+                store: storeName || "N/A",
               });
             }
           });
